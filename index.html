@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>R-52 Chart Recorder · a Video.js v10 skin</title>
+<meta name="description" content="A Video.js v10 skin built like a lab strip-chart recorder: the timeline is chart paper and a pen draws the video's sound as it plays.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="skin.css">
+<script type="module">
+  const V = 'https://cdn.jsdelivr.net/npm/@videojs/cdn@10.3.0';
+  const parts = ['container','controls','controls-content','controls-group','play-button','seek-button','mute-button',
+    'volume-slider','time-slider','slider-track','slider-buffer','slider-fill','slider-thumb','slider-preview','slider-value',
+    'time','time-group','time-separator','playback-rate-button','fullscreen-button','buffering-indicator','hotkey',
+    'status-announcer','error-dialog','dialog-popup','dialog-title','dialog-description','dialog-close'];
+  await import(V + '/video-player.js');
+  await Promise.all(parts.map(p => import(`${V}/ui/${p}.js`)));
+  await import('./recorder.js');
+</script>
+</head>
+<body>
+<main class="page">
+  <header class="page-head">
+    <p class="kicker">Video.js v10 skin</p>
+    <h1>R-52 Chart Recorder</h1>
+    <p class="lede">The timeline is chart paper. A pen writes the video's sound onto it as it plays, so you can see where people talk and where it goes quiet before you seek.</p>
+  </header>
+
+  <video-player>
+    <media-container class="r52" data-state="hold">
+      <video src="juno.mp4" poster="poster.jpg" playsinline preload="auto" crossorigin="anonymous"></video>
+
+      <media-buffering-indicator class="r52-buffering" aria-hidden="true"><span>Loading paper</span></media-buffering-indicator>
+
+      <media-controls class="r52-controls">
+        <media-controls-content class="r52-panel">
+
+          <div class="r52-plate" aria-hidden="true">
+            <span class="r52-model">R-52</span>
+            <span class="r52-name">Chart recorder</span>
+            <span class="r52-lamp" title="Status"></span>
+            <span class="r52-state">Hold</span>
+          </div>
+
+          <media-time-slider class="r52-chart" aria-label="Seek. The chart shows the sound level over time">
+            <canvas class="r52-ink" aria-hidden="true"></canvas>
+            <media-slider-track class="r52-track">
+              <media-slider-buffer class="r52-buffer"></media-slider-buffer>
+              <media-slider-fill class="r52-fill"></media-slider-fill>
+            </media-slider-track>
+            <media-slider-thumb class="r52-pen"><span class="r52-pen-tip"></span></media-slider-thumb>
+            <media-slider-preview class="r52-preview"><media-slider-value type="pointer"></media-slider-value></media-slider-preview>
+          </media-time-slider>
+
+          <media-controls-group class="r52-row" aria-label="Playback controls">
+            <media-play-button class="r52-key r52-run">
+              <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12.5-7.5z"/></svg>
+              <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 4.5h4v15h-4zM13.5 4.5h4v15h-4z"/></svg>
+              <svg class="i-replay" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
+              <span class="r52-cap"><span class="c-play">Run</span><span class="c-pause">Hold</span><span class="c-replay">Rewind</span></span>
+            </media-play-button>
+
+            <media-seek-button class="r52-key r52-seek" seconds="-5">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 6v12L3 12zM20 6v12l-8-6z"/></svg>
+              <span class="r52-cap">5s</span>
+            </media-seek-button>
+            <media-seek-button class="r52-key r52-seek" seconds="5">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 6v12l8-6zM4 6v12l8-6z"/></svg>
+              <span class="r52-cap">5s</span>
+            </media-seek-button>
+
+            <div class="r52-lcd">
+              <media-time-group>
+                <media-time type="current"></media-time>
+                <media-time-separator>/</media-time-separator>
+                <media-time type="duration"></media-time>
+              </media-time-group>
+            </div>
+
+            <div class="r52-gauges" aria-hidden="true">
+              <span><b>BUF</b><i data-gauge="buf">0.0s</i></span>
+              <span><b>DROP</b><i data-gauge="drop">0</i></span>
+              <span><b>LVL</b><i data-gauge="lvl">-∞</i></span>
+            </div>
+
+            <span class="r52-spacer"></span>
+
+            <media-playback-rate-button class="r52-key r52-speed" rates="1 1.25 1.5 2 0.5">
+              <span class="r52-cap">Paper</span><span class="r52-rate" data-rate-label>1×</span>
+            </media-playback-rate-button>
+
+            <div class="r52-vol">
+              <media-mute-button class="r52-key r52-mute">
+                <svg class="i-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4zM16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M4 9h4l5-4v14l-5-4H4z"/></svg>
+                <svg class="i-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9l5 6M21 9l-5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </media-mute-button>
+              <media-volume-slider class="r52-fader" aria-label="Volume">
+                <media-slider-track class="r52-fader-track"><media-slider-fill class="r52-fader-fill"></media-slider-fill></media-slider-track>
+                <media-slider-thumb class="r52-fader-knob"></media-slider-thumb>
+              </media-volume-slider>
+            </div>
+
+            <media-fullscreen-button class="r52-key r52-full">
+              <svg class="i-enter" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square"/></svg>
+              <svg class="i-exit" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square"/></svg>
+            </media-fullscreen-button>
+          </media-controls-group>
+        </media-controls-content>
+      </media-controls>
+
+      <media-hotkey keys="Space" action="togglePaused"></media-hotkey>
+      <media-hotkey keys="k" action="togglePaused"></media-hotkey>
+      <media-hotkey keys="m" action="toggleMuted"></media-hotkey>
+      <media-hotkey keys="f" action="toggleFullscreen"></media-hotkey>
+      <media-hotkey keys="ArrowLeft" action="seekStep" value="-5"></media-hotkey>
+      <media-hotkey keys="ArrowRight" action="seekStep" value="5"></media-hotkey>
+      <media-hotkey keys="ArrowUp" action="volumeStep" value="0.05"></media-hotkey>
+      <media-hotkey keys="ArrowDown" action="volumeStep" value="-0.05"></media-hotkey>
+      <media-hotkey keys="0-9" action="seekToPercent"></media-hotkey>
+      <media-status-announcer></media-status-announcer>
+
+      <media-error-dialog>
+        <media-dialog-popup class="r52-fault">
+          <p class="r52-fault-tag">Fault</p>
+          <media-dialog-title></media-dialog-title>
+          <media-dialog-description></media-dialog-description>
+          <media-dialog-close class="r52-key">Reset</media-dialog-close>
+        </media-dialog-popup>
+      </media-error-dialog>
+    </media-container>
+  </video-player>
+
+  <section class="notes">
+    <div>
+      <h2>How to read it</h2>
+      <p>Red ink is what has played. The faint pencil line ahead of the pen is the rest of the sound, drawn from the audio before you press Run, so loud and quiet parts are visible before you get there.</p>
+    </div>
+    <div>
+      <h2>Gauges</h2>
+      <p>BUF is seconds buffered ahead of the pen, DROP is dropped video frames from the browser, LVL is the sound level under the pen. The lamp is green when running, amber while loading, red on a fault.</p>
+    </div>
+    <div>
+      <h2>Keys</h2>
+      <p>Space or K run and hold. Left and right move 5 seconds, up and down set volume, M mutes, F is fullscreen, 0 to 9 jump through the chart.</p>
+    </div>
+  </section>
+  <footer class="foot">Video: Juno, an original ARKit 52 talking head I built and rigged. Skin by Muhammad Ali Sabir.</footer>
+</main>
+</body>
+</html>
